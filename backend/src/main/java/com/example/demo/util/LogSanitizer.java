@@ -78,7 +78,9 @@ public final class LogSanitizer {
             String rawKey = idx >= 0 ? pair.substring(0, idx) : pair;
             String rawValue = idx >= 0 && idx + 1 <= pair.length() ? pair.substring(idx + 1) : "";
             String key = urlDecode(rawKey);
-            String value = maskValue(urlDecode(rawValue));
+            // 必须按字段名分类脱敏（maskByKey），否则 reason/password 等敏感字段
+            // 的原文会作为普通字符串进入访问日志
+            String value = maskByKey(key, urlDecode(rawValue));
             putOrAppend(summary, key, value);
         }
         if (summary.size() == 0) {
